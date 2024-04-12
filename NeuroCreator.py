@@ -34,6 +34,105 @@ def pickle_dict(dictionary, filename):
 #############################
 
 
+
+def GenerateCode(DiagrammName):
+
+    Code=f"""
+import pickle
+
+# Activation functions
+def LinearBool(x):
+
+       if x>=0 :
+              return 1
+       else:
+              return 0
+def Bias(x):
+
+       return 1
+
+def Id(x):
+       return x
+
+###########
+
+Fucntions=$
+       "lb":  lambda x :  LinearBool(x)
+       , "b": lambda x:   Bias(x)
+       , "id": lambda x:  Id(x)
+       §
+       
+
+NeuronTypes=[ Type for Type in Fucntions]
+#########################################
+
+#Load Neurons
+with open('Neurons_{DiagrammName}.pkl', 'rb') as file:   Neurons = pickle.load(file)
+
+#Load Arrows
+with open('Arrows_{DiagrammName}.pkl', 'rb') as file:   Arrows = pickle.load(file)
+
+
+def RunNetwork_Test1(Input):
+
+       NumNeurons=len(Neurons)
+
+       for i in range( NumNeurons ):
+
+              neuron=Neurons[ str(i+1) ]
+              
+              Type=neuron[0].lower()
+              value=neuron[1]
+              NumNeuron=i+1
+
+              #Input neuron
+              
+              if Type=="i":
+                     Neurons[ str(i+1) ][1]=Input[i]
+                     continue
+
+              ######
+
+              if Type in NeuronTypes :
+
+                     net=0
+
+                     #Iterate over all connections
+
+                     for arrow in  Arrows:
+
+                            source=arrow[0]
+                            target=arrow[1]
+                            weight=float(arrow[2])
+
+
+                            if target==str(NumNeuron):
+
+                                   
+                                   x=float(Neurons[ source ][1])
+                                   net=net+x*weight
+
+                     #Compute activiation funcion
+
+                     value=Fucntions[Type](net)
+
+                     Neurons[ str(i+1) ][1]=value
+                     continue
+
+
+    """
+    return (Code.replace("$","{")).replace("§","}")
+
+    
+
+
+
+
+
+
+
+
+
 def CreateNeuronenAndWeights(Diagramm, DiagrammName):
 
        NeuronsIdtoNr={   }
@@ -60,11 +159,17 @@ def CreateNeuronenAndWeights(Diagramm, DiagrammName):
                      NeuroTyp=value[0]
 
                      NeuronsIdtoNr[Id]=Nr
-                     Neurons[Nr]=(NeuroTyp,1)
+                     Neurons[Nr]=[NeuroTyp,1]
 
               if Typ=="edgeLabel":
 
-                     Weights[parent]=value
+                  Tag="NoTrain"
+
+                  if value=="w":
+                      Tag="Train"
+                      value="0"
+                      
+                  Weights[parent]=(value,Tag)
 
        for arrow in Diagramm.arrows:
 
@@ -72,13 +177,19 @@ def CreateNeuronenAndWeights(Diagramm, DiagrammName):
               target=arrow.Attr["target"]
               Id=arrow.Attr["id"]
 
-              WeightsItem=(
+              Tag=Weights[Id][1]
+              Weight=Weights[Id][0]
+              
+
+              WeightsItem=[
                      
                      NeuronsIdtoNr[source] ,
                      NeuronsIdtoNr[target],
-                     Weights[Id]
+                     Weight,
+                     Tag
+                     
 
-                     )
+                     ]
 
               WeightArrows.append(  WeightsItem  )
 
@@ -107,7 +218,16 @@ def CreateNeuronenAndWeights(Diagramm, DiagrammName):
 
                      
                      
+def BuildNeuralNetworkModell(file_path, DiagrammName):
 
+    Diagramm=ParseDiagramsFromXmlFile(file_path)
+    Diagramm=Diagramm[DiagrammName]
+
+    FileName="Modell_"+DiagrammName+"/NeuroModell_"+DiagrammName+".py"
+
+    File=open(FileName,"w")
+    File.write( GenerateCode(DiagrammName) )
+    File.close(  )
                      
 
                      
@@ -122,10 +242,23 @@ def CreateNeuronenAndWeights(Diagramm, DiagrammName):
 file_path="NeuroTest.drawio"
 DiagrammName="Test1"
 
-Diagramm=ParseDiagramsFromXmlFile(file_path)
 
-Diagramm=Diagramm[DiagrammName]
+BuildNeuralNetworkModell(file_path, DiagrammName)
 
-CreateNeuronenAndWeights(Diagramm, DiagrammName)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

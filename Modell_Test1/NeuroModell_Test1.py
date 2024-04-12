@@ -1,7 +1,5 @@
+
 import pickle
-
-
-
 
 # Activation functions
 def LinearBool(x):
@@ -24,6 +22,7 @@ Fucntions={
        , "b": lambda x:   Bias(x)
        , "id": lambda x:  Id(x)
        }
+       
 
 NeuronTypes=[ Type for Type in Fucntions]
 #########################################
@@ -33,13 +32,6 @@ with open('Neurons_Test1.pkl', 'rb') as file:   Neurons = pickle.load(file)
 
 #Load Arrows
 with open('Arrows_Test1.pkl', 'rb') as file:   Arrows = pickle.load(file)
-
-
-
-#print(Neurons)
-print(Arrows)
-
-
 
 
 def RunNetwork_Test1(Input):
@@ -88,12 +80,5 @@ def RunNetwork_Test1(Input):
                      Neurons[ str(i+1) ][1]=value
                      continue
 
-                     
 
-print(Neurons)
-Input=[1,0,1]
-RunNetwork_Test1(Input)
-print(Neurons)
-Input=[1,1,1]
-RunNetwork_Test1(Input)
-print(Neurons)
+    
