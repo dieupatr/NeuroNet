@@ -84,3 +84,9 @@ Der **Output** ist:
 
 
 
+****************
+
+## Literatur
+
+
+[1] :  **neuronalenetze-de-zeta2-1col-dkrieselcom.pdf**
