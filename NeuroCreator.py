@@ -2,7 +2,7 @@ from LexDrawio import *
 import pickle
 
 import os
-
+import sys
 
 
 # Generate by AI
@@ -67,13 +67,13 @@ NeuronTypes=[ Type for Type in Fucntions]
 #########################################
 
 #Load Neurons
-with open('Neurons_{DiagrammName}.pkl', 'rb') as file:   Neurons = pickle.load(file)
+with open('Modell_{DiagrammName}/Neurons_{DiagrammName}.pkl', 'rb') as file:   Neurons = pickle.load(file)
 
 #Load Arrows
-with open('Arrows_{DiagrammName}.pkl', 'rb') as file:   Arrows = pickle.load(file)
+with open('Modell_{DiagrammName}/Weights_{DiagrammName}.pkl', 'rb') as file:   Arrows = pickle.load(file)
 
 
-def RunNetwork_Test1(Input):
+def RunNetwork_{DiagrammName}(Input):
 
        NumNeurons=len(Neurons)
 
@@ -118,7 +118,8 @@ def RunNetwork_Test1(Input):
 
                      Neurons[ str(i+1) ][1]=value
                      continue
-
+                     
+       return Neurons
 
     """
     return (Code.replace("$","{")).replace("§","}")
@@ -159,7 +160,7 @@ def CreateNeuronenAndWeights(Diagramm, DiagrammName):
                      NeuroTyp=value[0]
 
                      NeuronsIdtoNr[Id]=Nr
-                     Neurons[Nr]=[NeuroTyp,1]
+                     Neurons[Nr]=[NeuroTyp,    0]
 
               if Typ=="edgeLabel":
 
@@ -202,29 +203,21 @@ def CreateNeuronenAndWeights(Diagramm, DiagrammName):
 
        pickle_dict(Neurons ,Root+"/Neurons_"+ DiagrammName+".pkl")
 
-       pickle_dict(WeightArrows ,Root+"/Arrows_"+ DiagrammName+".pkl")
+       pickle_dict(WeightArrows ,Root+"/Weights_"+ DiagrammName+".pkl")
 
        
        
-
-              
-
-
-       
-       print(Neurons)
-       print(WeightArrows)
-
-                     
-
-                     
-                     
+                
 def BuildNeuralNetworkModell(file_path, DiagrammName):
 
     Diagramm=ParseDiagramsFromXmlFile(file_path)
     Diagramm=Diagramm[DiagrammName]
 
-    FileName="Modell_"+DiagrammName+"/NeuroModell_"+DiagrammName+".py"
+    FileName="NeuroModell_"+DiagrammName+".py"
 
+    create_folder("Modell_"+DiagrammName)
+    CreateNeuronenAndWeights(Diagramm, DiagrammName)
+    
     File=open(FileName,"w")
     File.write( GenerateCode(DiagrammName) )
     File.close(  )
@@ -233,14 +226,10 @@ def BuildNeuralNetworkModell(file_path, DiagrammName):
                      
               
        
-
-
-
-
-
-
-file_path="NeuroTest.drawio"
-DiagrammName="Test1"
+file_path=sys.argv[1]
+#"NeuroTest.drawio"
+DiagrammName=sys.argv[2]
+#"Test1"
 
 
 BuildNeuralNetworkModell(file_path, DiagrammName)
